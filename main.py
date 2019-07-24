@@ -11,12 +11,6 @@ api = Api(app)
 data = json.load(open('data.json'))
 
 
-@api.route('/status')
-class HelloWorld(Resource):
-    def get(self):
-        return {'message': 'online'}
-
-
 @api.route('/movies')
 class Movies(Resource):
     def get(self):
