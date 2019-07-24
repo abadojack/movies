@@ -3,6 +3,8 @@ from flask_restplus import Resource, Api
 import json
 from flask_restplus import reqparse
 
+import re
+
 app = Flask(__name__)
 api = Api(app)
 
@@ -40,12 +42,18 @@ class MoviesSearch(Resource):
         parser.add_argument('genre')
         args = parser.parse_args()
 
-        return self.search(args)
+        name = args["name"]
+        genre = args["genre"]
 
-    def search(self, request_args):
+        if not name:
+            return {"error": "Include name in search parameters"}, 400
+        if genre:
+            if not re.match('^[a-zA-Z0-9]*$', genre):
+                return {"error": "Invalid genre"}, 400
+        return self.search(name, genre)
+
+    def search(self, name, genre):
         response = []
-        name = request_args["name"]
-        genre = request_args["genre"]
 
         for item in data:
             if name.lower() in item["name"].lower():
@@ -56,7 +64,7 @@ class MoviesSearch(Resource):
                     response.append(item)
 
         if not response:
-            return {"message": "Movie not found"}, 404
+            return {"error": "Movie not found"}, 404
         return response
 
 
